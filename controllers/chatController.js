@@ -1,9 +1,14 @@
+const mongoose = require('mongoose');
 const axios = require('axios');
-const memoryService = require('../services/memoryService');
-const UserMemory = require('../models/UserMemory');
 const crypto = require('crypto');
+const UserMemory = require('../models/UserMemory');
+const memoryService = require('../services/memoryService');
+
+// Helper: check if DB is connected before querying
+const isDbReady = () => mongoose.connection.readyState === 1;
 
 const createChat = async (req, res) => {
+    if (!isDbReady()) return res.status(503).json({ error: "Database not ready yet, please retry." });
     try {
         const { userId = 'default', title, subjectTag } = req.body;
         const chatId = crypto.randomUUID();
@@ -22,6 +27,7 @@ const createChat = async (req, res) => {
 };
 
 const listChats = async (req, res) => {
+    if (!isDbReady()) return res.status(503).json({ error: "Database not ready yet, please retry." });
     try {
         const { userId = 'default' } = req.query;
         const user = await UserMemory.findOne({ userId });
@@ -35,12 +41,12 @@ const listChats = async (req, res) => {
 };
 
 const deleteChat = async (req, res) => {
+    if (!isDbReady()) return res.status(503).json({ error: "Database not ready yet, please retry." });
     try {
         const { userId = 'default', chatId } = req.body;
         const user = await UserMemory.findOne({ userId });
         if (!user) return res.status(404).json({ error: "User not found" });
 
-        // Purge the chat and ALL associated strictly scoped memory clusters safely
         user.chats = user.chats.filter(c => c.chatId !== chatId);
         user.episodic = user.episodic.filter(e => e.chatId !== chatId);
         user.semantic = user.semantic.filter(s => s.chatId !== chatId);

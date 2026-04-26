@@ -11,9 +11,12 @@ const app = express();
 // =======================
 // Database Connection
 // =======================
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/nova_ai')
+mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/nova_ai', {
+    serverSelectionTimeoutMS: 5000,
+    connectTimeoutMS: 10000,
+})
     .then(() => console.log('✅ MongoDB connected'))
-    .catch(err => console.error('❌ MongoDB connection error:', err));
+    .catch(err => console.error('❌ MongoDB connection error:', err.message));
 
 // =======================
 // Middleware
