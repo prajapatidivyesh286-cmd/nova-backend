@@ -37,6 +37,7 @@ app.use('/chat', limiter);
 const chatController = require('./controllers/chatController');
 const flashcardController = require('./controllers/flashcardController');
 const visionController = require('./controllers/visionController');
+const dailyPlanController = require('./controllers/dailyPlanController');
 const multer = require('multer');
 const upload = multer({ limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB Limit
 
@@ -56,6 +57,10 @@ app.post('/flashcards/review', flashcardController.updateReview);
 
 // Vision Routes
 app.post('/vision/analyze', upload.single('image'), visionController.analyzeImage);
+
+// Daily Plan Routes
+app.get('/daily-plan', dailyPlanController.getTodayPlan);
+app.post('/daily-plan/complete', dailyPlanController.completeTask);
 
 // =======================
 // Start Server
