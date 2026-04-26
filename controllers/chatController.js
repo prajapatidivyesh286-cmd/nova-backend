@@ -120,8 +120,11 @@ Ensure your response is highly optimized:
         return res.status(200).json({ reply: aiResponse });
 
     } catch (error) {
-        console.error(error);
-        return res.status(500).json({ error: "Nova AI failed" });
+        console.error("[Chat Error]:", error.response ? error.response.data : error.message);
+        return res.status(500).json({ 
+            error: "Nova AI failed", 
+            details: error.response ? error.response.data : error.message 
+        });
     }
 };
 
