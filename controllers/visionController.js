@@ -48,7 +48,15 @@ If there is no problem to solve, set solution to 'N/A'. Use clear, student-frien
             }
         });
 
+        console.log("Vision API Response received.");
+
+        if (!response.data.choices || response.data.choices.length === 0) {
+            console.error("Vision API returned no choices:", response.data);
+            throw new Error("No response from Vision AI");
+        }
+
         const analysis = JSON.parse(response.data.choices[0].message.content);
+        console.log("Analysis parsed successfully.");
 
         // Memory Integration: Save the core facts into Semantic Memory
         const memoryFact = `Visual Analysis Result: ${analysis.explanation}. Key Facts: ${analysis.keyPoints.join(', ')}`;

@@ -39,7 +39,10 @@ const flashcardController = require('./controllers/flashcardController');
 const visionController = require('./controllers/visionController');
 const dailyPlanController = require('./controllers/dailyPlanController');
 const multer = require('multer');
-const upload = multer({ limits: { fileSize: 5 * 1024 * 1024 } }); // 5MB Limit
+const upload = multer({ 
+    storage: multer.memoryStorage(),
+    limits: { fileSize: 10 * 1024 * 1024 } // Increase to 10MB
+}); 
 
 app.get('/', (req, res) => res.json({ status: "Nova AI Backend is running!" }));
 
