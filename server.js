@@ -35,12 +35,21 @@ app.use('/chat', limiter);
 // Routes
 // =======================
 const chatController = require('./controllers/chatController');
+const flashcardController = require('./controllers/flashcardController');
 
 app.get('/', (req, res) => res.json({ status: "Nova AI Backend is running!" }));
+
+// Chat Routes
 app.post('/chat', chatController.handleChat);
 app.post('/chat/create', chatController.createChat);
 app.get('/chat/list', chatController.listChats);
 app.post('/chat/delete', chatController.deleteChat);
+
+// Flashcard Routes
+app.post('/flashcards/generate', flashcardController.generateFlashcards);
+app.get('/flashcards/list', flashcardController.listAllCards);
+app.get('/flashcards/review', flashcardController.getReviewCards);
+app.post('/flashcards/review', flashcardController.updateReview);
 
 // =======================
 // Start Server
