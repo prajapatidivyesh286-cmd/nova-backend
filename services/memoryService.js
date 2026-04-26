@@ -168,7 +168,34 @@ const injectMemoryIntoPrompt = async (userId = 'default', chatId, currentQuery =
     return prompt;
 };
 
+const generateChatTitle = async (userMessage, aiResponse) => {
+    try {
+        const prompt = `Generate a very short (max 3 words) descriptive title for a conversation starting with:
+User: "${userMessage}"
+AI: "${aiResponse}"
+Return ONLY the title text, no quotes or punctuation.`;
+
+        const payload = {
+            model: "openai/gpt-4o-mini",
+            messages: [{ role: "system", content: prompt }]
+        };
+
+        const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', payload, {
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`
+            }
+        });
+
+        return response.data.choices[0].message.content.trim();
+    } catch (e) {
+        console.error("Title generation failed:", e);
+        return null;
+    }
+};
+
 module.exports = {
     updateMemoryAsync,
-    injectMemoryIntoPrompt
+    injectMemoryIntoPrompt,
+    generateChatTitle
 };

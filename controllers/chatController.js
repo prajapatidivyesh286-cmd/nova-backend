@@ -114,10 +114,32 @@ Ensure your response is highly optimized:
         const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', payload, { headers });
         const aiResponse = response.data.choices[0].message.content;
 
+        // --- CHAT AUTO-NAMING ---
+        let newTitle = null;
+        try {
+            const user = await UserMemory.findOne({ userId });
+            const chat = user.chats.find(c => c.chatId === chatId);
+            
+            // Only rename if it's a default/generic title
+            const genericTitles = ["General Chat", "New Subject", "New Chat", "Subject"];
+            if (chat && genericTitles.includes(chat.title)) {
+                newTitle = await memoryService.generateChatTitle(currentQuery, aiResponse);
+                if (newTitle) {
+                    chat.title = newTitle;
+                    await user.save();
+                }
+            }
+        } catch (e) {
+            console.error("Auto-naming error:", e);
+        }
+
         // Async Memory Update (Fire and forget, tightly scoped to chatId!)
         memoryService.updateMemoryAsync(userId, chatId, incomingMessages, aiResponse);
 
-        return res.status(200).json({ reply: aiResponse });
+        return res.status(200).json({ 
+            reply: aiResponse,
+            newTitle: newTitle // Pass this back to Flutter to update the UI
+        });
 
     } catch (error) {
         console.error("[Chat Error]:", error.response ? error.response.data : error.message);
