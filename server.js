@@ -1,53 +1,48 @@
-// Import necessary modules
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const rateLimit = require('express-rate-limit');
+const mongoose = require('mongoose');
 
-// Load environment variables from the .env file
 dotenv.config();
 
-// Import routes
-const chatRoutes = require('./routes/chatRoutes');
-
-// Initialize the Express application
 const app = express();
 
 // =======================
-// Middleware Setup
+// Database Connection
 // =======================
+mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/nova_ai')
+    .then(() => console.log('✅ MongoDB connected'))
+    .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// 1. CORS Middleware: Allows your Flutter/Web frontend to communicate with this backend securely
+// =======================
+// Middleware
+// =======================
 app.use(cors());
-
-// 2. JSON Middleware: Parses incoming requests with JSON payloads properly
 app.use(express.json());
 
-// 3. Rate Limiting: Prevents abuse by limiting the number of requests per IP
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes window
-    max: 100, // Limit each IP to 100 requests per 15 minutes
+    windowMs: 15 * 60 * 1000,
+    max: 100,
     message: { error: "Too many requests, please try again later." }
 });
 app.use('/chat', limiter);
 
 // =======================
-// Routes Setup
+// Routes
 // =======================
+const chatController = require('./controllers/chatController');
 
-// All routes starting with '/chat' will be handled by chatRoutes
-app.use('/chat', chatRoutes);
-
-// Add a simple health check endpoint
-app.get('/', (req, res) => {
-    res.json({ status: "Nova AI Backend is running securely!" });
-});
+app.get('/', (req, res) => res.json({ status: "Nova AI Backend is running!" }));
+app.post('/chat', chatController.handleChat);
+app.post('/chat/create', chatController.createChat);
+app.get('/chat/list', chatController.listChats);
+app.post('/chat/delete', chatController.deleteChat);
 
 // =======================
-// Server Initialization
+// Start Server
 // =======================
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Nova backend is running securely and actively bound to http://0.0.0.0:${PORT}`);
-    console.log(`Local Access: http://localhost:${PORT}`);
+    console.log(`🚀 Nova backend running on http://localhost:${PORT}`);
 });
