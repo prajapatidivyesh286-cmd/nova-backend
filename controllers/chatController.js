@@ -115,7 +115,7 @@ Ensure your response is highly optimized:
         const aiResponse = response.data.choices[0].message.content;
 
         // Async Memory Update (Fire and forget, tightly scoped to chatId!)
-        memoryService.updateMemoryAsync(userId, chatId, incomingMessages, aiResponse).catch(err => console.error("Memory Update Error: ", err));
+        memoryService.updateMemoryAsync(userId, chatId, incomingMessages, aiResponse);
 
         return res.status(200).json({ reply: aiResponse });
 
