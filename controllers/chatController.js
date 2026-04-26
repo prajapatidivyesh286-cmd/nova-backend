@@ -3,6 +3,7 @@ const axios = require('axios');
 const crypto = require('crypto');
 const UserMemory = require('../models/UserMemory');
 const memoryService = require('../services/memoryService');
+const mindmapService = require('../services/mindmapService');
 
 // Helper: check if DB is connected before querying
 const isDbReady = () => mongoose.connection.readyState === 1;
@@ -136,9 +137,19 @@ Ensure your response is highly optimized:
         // Async Memory Update (Fire and forget, tightly scoped to chatId!)
         memoryService.updateMemoryAsync(userId, chatId, incomingMessages, aiResponse);
 
+        // --- MIND MAP DETECTION ---
+        let mindmapData = null;
+        const triggerWords = ["explain", "overview", "what is", "how does", "summarize", "mindmap", "concept"];
+        const shouldGenMindmap = triggerWords.some(word => currentQuery.toLowerCase().startsWith(word));
+
+        if (shouldGenMindmap) {
+            mindmapData = await mindmapService.generateMindMap(currentQuery, chatId);
+        }
+
         return res.status(200).json({ 
-            reply: aiResponse,
-            newTitle: newTitle // Pass this back to Flutter to update the UI
+            reply: mindmapData ? `I've organized a visual mind map for ${currentQuery} below!` : aiResponse,
+            newTitle: newTitle,
+            mindmap: mindmapData // Pass the JSON structure to Flutter
         });
 
     } catch (error) {
