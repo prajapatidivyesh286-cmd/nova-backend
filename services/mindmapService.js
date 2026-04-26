@@ -2,24 +2,28 @@ const axios = require('axios');
 
 const generateMindMap = async (topic, chatId) => {
     try {
-        const prompt = `You are a world-class educational architect. Transform the topic "${topic}" into a structured, interactive Mind Map.
+        const prompt = `You are a world-class educational architect. Transform "${topic}" into a structured, visual Mind Map.
 Rules:
-- Focus on clarity and logical hierarchy.
-- Use simple, punchy labels (max 3 words).
-- Provide a 1-sentence summary for every node.
-- Max 5-7 main branches.
-- Max 2-3 levels of depth.
+- 4-6 Main Branches (use vibrant HEX colors).
+- Each branch has 3-5 Nodes.
+- Descriptions must be 2-3 lines max.
+- Use clear, exam-focused hierarchy.
 
-OUTPUT STRICT JSON FORMAT:
+OUTPUT STRICT JSON:
 {
-  "title": "${topic}",
-  "nodes": [
+  "topic": "${topic}",
+  "branches": [
     {
-      "id": "1",
-      "label": "Main Branch",
-      "summary": "...",
-      "children": [
-        { "id": "1.1", "label": "Subtopic", "summary": "...", "children": [] }
+      "title": "Branch Title",
+      "color": "#HEXCODE",
+      "nodes": [
+        {
+          "title": "Subtopic",
+          "description": "...",
+          "children": [
+             { "title": "Detail", "description": "..." }
+          ]
+        }
       ]
     }
   ]
@@ -33,8 +37,7 @@ OUTPUT STRICT JSON FORMAT:
             headers: { 'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}` }
         });
 
-        const data = JSON.parse(response.data.choices[0].message.content);
-        return data;
+        return JSON.parse(response.data.choices[0].message.content);
     } catch (e) {
         console.error("Mind Map Gen Error:", e);
         return null;
