@@ -74,6 +74,11 @@ app.post('/daily-plan/complete', dailyPlanController.completeTask);
 
 // Quiz Routes
 app.post('/quiz/generate', quizController.generateQuiz);
+app.post('/quiz/save', quizController.saveQuizResult);
+
+// Stats Routes
+const statsController = require('./controllers/statsController');
+app.get('/stats/mastery', statsController.getMasteryStats);
 
 // =======================
 // Start Server

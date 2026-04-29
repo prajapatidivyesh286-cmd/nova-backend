@@ -1,5 +1,6 @@
 const axios = require('axios');
 const memoryService = require('../services/memoryService');
+const QuizResult = require('../models/QuizResult');
 
 const generateQuiz = async (req, res) => {
     try {
@@ -55,4 +56,24 @@ Return a STRICT JSON response with this structure:
     }
 };
 
-module.exports = { generateQuiz };
+const saveQuizResult = async (req, res) => {
+    try {
+        const { userId = 'default', chatId, score, totalQuestions, subject } = req.body;
+        
+        const result = new QuizResult({
+            userId,
+            chatId,
+            score,
+            totalQuestions,
+            subject
+        });
+
+        await result.save();
+        return res.status(200).json({ status: "success", message: "Result saved!" });
+    } catch (error) {
+        console.error("Save Quiz Error:", error);
+        return res.status(500).json({ error: "Failed to save quiz result" });
+    }
+};
+
+module.exports = { generateQuiz, saveQuizResult };
