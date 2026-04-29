@@ -70,7 +70,8 @@ Return a STRICT JSON response with this structure:
 
     } catch (error) {
         console.error("PDF API Error:", error.response ? error.response.data : error.message);
-        return res.status(500).json({ error: "Failed to analyze PDF document." });
+        const detailedError = error.message || "Unknown error";
+        return res.status(500).json({ error: `Failed to analyze PDF document. (Internal: ${detailedError})` });
     }
 };
 
