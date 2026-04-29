@@ -1,4 +1,4 @@
-const Chat = require('../models/UserMemory').Chat;
+const UserMemory = require('../models/UserMemory');
 const QuizResult = require('../models/QuizResult');
 const Flashcard = require('../models/Flashcard');
 
@@ -6,8 +6,14 @@ const getMasteryStats = async (req, res) => {
     try {
         const { userId = 'default' } = req.query;
 
-        // 1. Get all subjects (chats)
-        const chats = await Chat.find({}); // Get all for now since we're in default mode
+        // 1. Get User Memory which contains the chats array
+        const memory = await UserMemory.findOne({ userId });
+        
+        if (!memory || !memory.chats) {
+            return res.status(200).json([]); // No data yet
+        }
+
+        const chats = memory.chats;
         console.log(`Found ${chats.length} chats for stats.`);
         
         const stats = await Promise.all(chats.map(async (chat) => {
