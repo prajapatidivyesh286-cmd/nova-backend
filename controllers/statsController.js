@@ -7,7 +7,8 @@ const getMasteryStats = async (req, res) => {
         const { userId = 'default' } = req.query;
 
         // 1. Get all subjects (chats)
-        const chats = await Chat.find({ userId });
+        const chats = await Chat.find({}); // Get all for now since we're in default mode
+        console.log(`Found ${chats.length} chats for stats.`);
         
         const stats = await Promise.all(chats.map(async (chat) => {
             // 2. Get Quiz Results for this subject
