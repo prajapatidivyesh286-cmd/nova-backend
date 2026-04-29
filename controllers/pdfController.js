@@ -8,13 +8,12 @@ const parsePdfContent = async (buffer) => {
         // Style 1: Direct function
         if (typeof pdf === 'function') return await pdf(buffer);
         
-        // Style 2: Default export
-        if (pdf && typeof pdf.default === 'function') return await pdf.default(buffer);
+        // Style 2: Named property (Found to be PDFParse on this system)
+        if (pdf && typeof pdf.PDFParse === 'function') return await pdf.PDFParse(buffer);
         
-        // Style 3: Some versions use a named property
-        if (pdf && typeof pdf.pdf === 'function') return await pdf.pdf(buffer);
+        // Style 3: Default export
+        if (pdf && typeof pdf.default === 'function') return await pdf.default(buffer);
 
-        // If we get here, it's really weird. Let's describe what it IS.
         const type = typeof pdf;
         const keys = Object.keys(pdf || {}).join(', ');
         throw new Error(`PDF Library loaded as ${type}. Keys: [${keys}]`);
