@@ -1,26 +1,6 @@
-const pdf = require('pdf-parse');
+const pdfParse = require('pdf-parse');
 const axios = require('axios');
 const memoryService = require('../services/memoryService');
-
-// Deep Inspector for PDF Library
-const parsePdfContent = async (buffer) => {
-    try {
-        // Style 1: Direct function
-        if (typeof pdf === 'function') return await pdf(buffer);
-        
-        // Style 2: Named property (Found to be PDFParse on this system)
-        if (pdf && typeof pdf.PDFParse === 'function') return await pdf.PDFParse(buffer);
-        
-        // Style 3: Default export
-        if (pdf && typeof pdf.default === 'function') return await pdf.default(buffer);
-
-        const type = typeof pdf;
-        const keys = Object.keys(pdf || {}).join(', ');
-        throw new Error(`PDF Library loaded as ${type}. Keys: [${keys}]`);
-    } catch (e) {
-        throw e;
-    }
-};
 
 const analyzePdf = async (req, res) => {
     try {
@@ -33,7 +13,7 @@ const analyzePdf = async (req, res) => {
         console.log("Parsing PDF...");
         let pdfData;
         try {
-            pdfData = await parsePdfContent(file.buffer);
+            pdfData = await pdfParse(file.buffer);
         } catch (parseError) {
             console.error("pdf-parse failed:", parseError);
             return res.status(400).json({ error: `PDF Engine failed to read file. (Error: ${parseError.message || "Unknown Format"})` });
