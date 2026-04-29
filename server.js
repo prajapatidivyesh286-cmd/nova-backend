@@ -38,13 +38,17 @@ const chatController = require('./controllers/chatController');
 const flashcardController = require('./controllers/flashcardController');
 const visionController = require('./controllers/visionController');
 const dailyPlanController = require('./controllers/dailyPlanController');
+const pdfController = require('./controllers/pdfController');
 const multer = require('multer');
 const upload = multer({ 
     storage: multer.memoryStorage(),
-    limits: { fileSize: 10 * 1024 * 1024 } // Increase to 10MB
+    limits: { fileSize: 10 * 1024 * 1024 } // Increase to 10MB for PDFs too
 }); 
 
 app.get('/', (req, res) => res.json({ status: "Nova AI Backend is running!" }));
+
+// PDF Analyzer Route
+app.post('/pdf/analyze', upload.single('pdf'), pdfController.analyzePdf);
 
 // Chat Routes
 app.post('/chat', chatController.handleChat);
