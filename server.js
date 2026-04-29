@@ -39,6 +39,7 @@ const flashcardController = require('./controllers/flashcardController');
 const visionController = require('./controllers/visionController');
 const dailyPlanController = require('./controllers/dailyPlanController');
 const pdfController = require('./controllers/pdfController');
+const quizController = require('./controllers/quizController');
 const multer = require('multer');
 const upload = multer({ 
     storage: multer.memoryStorage(),
@@ -70,6 +71,9 @@ app.post('/vision/analyze', upload.single('image'), visionController.analyzeImag
 // Daily Plan Routes
 app.get('/daily-plan', dailyPlanController.getTodayPlan);
 app.post('/daily-plan/complete', dailyPlanController.completeTask);
+
+// Quiz Routes
+app.post('/quiz/generate', quizController.generateQuiz);
 
 // =======================
 // Start Server
