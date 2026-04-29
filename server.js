@@ -80,6 +80,10 @@ app.post('/quiz/save', quizController.saveQuizResult);
 const statsController = require('./controllers/statsController');
 app.get('/stats/mastery', statsController.getMasteryStats);
 
+// Study Guide Routes
+const studyGuideController = require('./controllers/studyGuideController');
+app.post('/study-guide/generate', studyGuideController.generateStudyGuide);
+
 // =======================
 // Start Server
 // =======================
