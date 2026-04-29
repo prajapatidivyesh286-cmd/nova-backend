@@ -1,6 +1,13 @@
-const pdfParse = require('pdf-parse');
+const pdf = require('pdf-parse');
 const axios = require('axios');
 const memoryService = require('../services/memoryService');
+
+// Helper to handle different import styles of pdf-parse
+const parsePdfContent = async (buffer) => {
+    if (typeof pdf === 'function') return await pdf(buffer);
+    if (pdf && typeof pdf.default === 'function') return await pdf.default(buffer);
+    throw new Error("PDF Library loaded incorrectly. 'pdf-parse' is not a function.");
+};
 
 const analyzePdf = async (req, res) => {
     try {
@@ -13,7 +20,7 @@ const analyzePdf = async (req, res) => {
         console.log("Parsing PDF...");
         let pdfData;
         try {
-            pdfData = await pdfParse(file.buffer);
+            pdfData = await parsePdfContent(file.buffer);
         } catch (parseError) {
             console.error("pdf-parse failed:", parseError);
             return res.status(400).json({ error: `PDF Engine failed to read file. (Error: ${parseError.message || "Unknown Format"})` });
