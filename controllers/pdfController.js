@@ -2,11 +2,25 @@ const pdf = require('pdf-parse');
 const axios = require('axios');
 const memoryService = require('../services/memoryService');
 
-// Helper to handle different import styles of pdf-parse
+// Deep Inspector for PDF Library
 const parsePdfContent = async (buffer) => {
-    if (typeof pdf === 'function') return await pdf(buffer);
-    if (pdf && typeof pdf.default === 'function') return await pdf.default(buffer);
-    throw new Error("PDF Library loaded incorrectly. 'pdf-parse' is not a function.");
+    try {
+        // Style 1: Direct function
+        if (typeof pdf === 'function') return await pdf(buffer);
+        
+        // Style 2: Default export
+        if (pdf && typeof pdf.default === 'function') return await pdf.default(buffer);
+        
+        // Style 3: Some versions use a named property
+        if (pdf && typeof pdf.pdf === 'function') return await pdf.pdf(buffer);
+
+        // If we get here, it's really weird. Let's describe what it IS.
+        const type = typeof pdf;
+        const keys = Object.keys(pdf || {}).join(', ');
+        throw new Error(`PDF Library loaded as ${type}. Keys: [${keys}]`);
+    } catch (e) {
+        throw e;
+    }
 };
 
 const analyzePdf = async (req, res) => {
