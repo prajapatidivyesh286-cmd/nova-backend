@@ -11,11 +11,20 @@ const analyzePdf = async (req, res) => {
         if (!chatId) return res.status(400).json({ error: "chatId is required for memory context" });
 
         console.log("Parsing PDF...");
-        const pdfData = await pdfParse(file.buffer);
-        const fullText = pdfData.text;
+        let pdfData;
+        try {
+            pdfData = await pdfParse(file.buffer);
+        } catch (parseError) {
+            console.error("pdf-parse failed:", parseError);
+            return res.status(400).json({ error: "Could not parse PDF. The file might be corrupted or scanned (no text)." });
+        }
+
+        const fullText = pdfData.text || "";
+        if (fullText.trim().length < 10) {
+            return res.status(400).json({ error: "The PDF appears to be empty or contains only images. Nova currently only analyzes text-based documents." });
+        }
 
         // If the PDF is massive, we only take the first 15,000 characters for the summary 
-        // to prevent token overflow, but we can extract key concepts from it.
         const textToAnalyze = fullText.length > 15000 ? fullText.substring(0, 15000) + "..." : fullText;
 
         const systemPrompt = `You are a world-class AI Study Assistant. The user has uploaded a PDF document.
@@ -46,7 +55,11 @@ Return a STRICT JSON response with this structure:
             throw new Error("No response from AI");
         }
 
-        const analysis = JSON.parse(response.data.choices[0].message.content);
+        let content = response.data.choices[0].message.content;
+        // Strip markdown if AI added it
+        content = content.replace(/```json/g, '').replace(/```/g, '').trim();
+        
+        const analysis = JSON.parse(content);
         console.log("PDF Analysis complete:", analysis.title);
 
         // Save the massive context to the Semantic Memory!
