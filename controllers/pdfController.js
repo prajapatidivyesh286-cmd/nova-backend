@@ -16,7 +16,7 @@ const analyzePdf = async (req, res) => {
             pdfData = await pdfParse(file.buffer);
         } catch (parseError) {
             console.error("pdf-parse failed:", parseError);
-            return res.status(400).json({ error: "Could not parse PDF. The file might be corrupted or scanned (no text)." });
+            return res.status(400).json({ error: `PDF Engine failed to read file. (Error: ${parseError.message || "Unknown Format"})` });
         }
 
         const fullText = pdfData.text || "";
