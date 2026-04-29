@@ -51,6 +51,8 @@ app.post('/chat', chatController.handleChat);
 app.post('/chat/create', chatController.createChat);
 app.get('/chat/list', chatController.listChats);
 app.post('/chat/delete', chatController.deleteChat);
+app.post('/chat/sync', chatController.syncMessages);
+app.get('/chat/messages', chatController.getMessages);
 
 // Flashcard Routes
 app.post('/flashcards/generate', flashcardController.generateFlashcards);

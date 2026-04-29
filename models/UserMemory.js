@@ -4,7 +4,13 @@ const ChatSchema = new mongoose.Schema({
     chatId: { type: String, required: true },
     title: String,
     subjectTag: String,
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+    messages: [{
+        text: String,
+        isUser: Boolean,
+        timestamp: { type: Date, default: Date.now },
+        mindmapData: mongoose.Schema.Types.Mixed
+    }]
 });
 
 const UserMemorySchema = new mongoose.Schema({

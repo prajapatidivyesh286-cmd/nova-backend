@@ -161,9 +161,48 @@ Ensure your response is highly optimized:
     }
 };
 
+const syncMessages = async (req, res) => {
+    try {
+        const { userId = 'default', chatId, messages } = req.body;
+        if (!chatId || !messages) return res.status(400).json({ error: "Missing required fields" });
+
+        const user = await UserMemory.findOne({ userId });
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        const chat = user.chats.find(c => c.chatId === chatId);
+        if (chat) {
+            chat.messages = messages;
+            await user.save();
+        }
+        res.status(200).json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to sync messages" });
+    }
+};
+
+const getMessages = async (req, res) => {
+    try {
+        const { userId = 'default', chatId } = req.query;
+        if (!chatId) return res.status(400).json({ error: "Missing chatId" });
+
+        const user = await UserMemory.findOne({ userId });
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        const chat = user.chats.find(c => c.chatId === chatId);
+        if (chat && chat.messages) {
+            return res.status(200).json({ messages: chat.messages });
+        }
+        return res.status(200).json({ messages: [] });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch messages" });
+    }
+};
+
 module.exports = {
     createChat,
     listChats,
     deleteChat,
-    handleChat
+    handleChat,
+    syncMessages,
+    getMessages
 };
