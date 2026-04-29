@@ -11,7 +11,11 @@ const analyzeImage = async (req, res) => {
 
         // Convert image buffer to base64
         const base64Image = file.buffer.toString('base64');
-        const mimeType = file.mimetype;
+        let mimeType = file.mimetype;
+        if (!mimeType || mimeType === 'application/octet-stream') {
+            const ext = file.originalname ? file.originalname.split('.').pop().toLowerCase() : 'jpg';
+            mimeType = ext === 'png' ? 'image/png' : (ext === 'webp' ? 'image/webp' : 'image/jpeg');
+        }
 
         const systemPrompt = `You are an expert AI tutor. Analyze the uploaded image and return structured educational output. 
 Follow this format strictly and return ONLY JSON:
