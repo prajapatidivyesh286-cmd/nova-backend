@@ -28,13 +28,26 @@ const analyzePdf = async (req, res) => {
         // If the PDF is massive, we only take the first 15,000 characters for the summary 
         const textToAnalyze = fullText.length > 15000 ? fullText.substring(0, 15000) + "..." : fullText;
 
-        const systemPrompt = `You are a world-class AI Study Assistant. The user has uploaded a PDF document.
-Analyze the following text extracted from the PDF.
+        const systemPrompt = `You are a world-class AI Study Assistant. The user has uploaded a PDF chapter/document.
+Analyze the following text and generate a COMPLETE Study Suite.
 Return a STRICT JSON response with this structure:
 {
-  "title": "A short, descriptive title of the document",
-  "summary": "A 3-4 sentence high-level summary of what this document is about.",
-  "keyConcepts": ["Concept 1", "Concept 2", "Concept 3", "Concept 4", "Concept 5"]
+  "title": "Clear title of the chapter",
+  "summary": "A high-level 2-sentence overview.",
+  "explanation": "A deep, simple, professor-level explanation of the entire chapter in 3-4 paragraphs.",
+  "studyNotes": [
+    {"topic": "Subtopic Title", "content": "Detailed bullet points or explanation"}
+  ],
+  "keyConcepts": ["Concept 1", "Concept 2"],
+  "mindmap": {
+     "name": "Chapter Root",
+     "children": [
+        {"name": "Main Topic", "children": [{"name": "Sub Topic"}]}
+     ]
+  },
+  "examQuestions": [
+    {"question": "Predicted Exam Question", "answer": "The core answer concept"}
+  ]
 }`;
 
         console.log("Sending PDF text to AI for analysis...");
@@ -64,8 +77,11 @@ Return a STRICT JSON response with this structure:
         console.log("PDF Analysis complete:", analysis.title);
 
         // Save the massive context to the Semantic Memory!
-        const memoryFact = `Uploaded Document: ${analysis.title}. Summary: ${analysis.summary}. Core Concepts: ${analysis.keyConcepts.join(', ')}`;
-        memoryService.updateMemoryAsync(userId, chatId, [{role: 'user', content: 'Uploaded a PDF document'}], memoryFact);
+        const memoryFact = `Chapter Analysis: ${analysis.title}. Summary: ${analysis.summary}. 
+        Key Explanation: ${analysis.explanation.substring(0, 500)}... 
+        Exam Predictions: ${analysis.examQuestions.map(q => q.question).join(' | ')}`;
+        
+        memoryService.updateMemoryAsync(userId, chatId, [{role: 'user', content: 'Uploaded a PDF for full transformation'}], memoryFact);
 
         return res.status(200).json(analysis);
 
