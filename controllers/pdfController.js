@@ -40,9 +40,15 @@ Return a STRICT JSON response with this structure:
   ],
   "keyConcepts": ["Concept 1", "Concept 2"],
   "mindmap": {
-     "name": "Chapter Root",
-     "children": [
-        {"name": "Main Topic", "children": [{"name": "Sub Topic"}]}
+     "topic": "Chapter Title",
+     "branches": [
+        {
+          "title": "Main Concept",
+          "color": "#2196F3",
+          "nodes": [
+            {"title": "Subtopic", "description": "Short explanation"}
+          ]
+        }
      ]
   },
   "examQuestions": [
