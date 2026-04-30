@@ -5,7 +5,8 @@ const memoryService = require('../services/memoryService');
 
 const generateStudyGuide = async (req, res) => {
     try {
-        const { userId = 'default', chatId } = req.body;
+        const userId = req.userId;
+        const { chatId } = req.body;
         if (!chatId) return res.status(400).json({ error: "chatId is required" });
 
         console.log("Compiling Study Guide for Chat:", chatId);

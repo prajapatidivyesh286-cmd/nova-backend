@@ -40,6 +40,8 @@ const visionController = require('./controllers/visionController');
 const dailyPlanController = require('./controllers/dailyPlanController');
 const pdfController = require('./controllers/pdfController');
 const quizController = require('./controllers/quizController');
+const authController = require('./controllers/authController');
+const authMiddleware = require('./middleware/authMiddleware');
 const multer = require('multer');
 const upload = multer({ 
     storage: multer.memoryStorage(),
@@ -48,41 +50,45 @@ const upload = multer({
 
 app.get('/', (req, res) => res.json({ status: "Nova AI Backend is running!" }));
 
+// Auth Routes
+app.post('/auth/register', authController.register);
+app.post('/auth/login', authController.login);
+
 // PDF Analyzer Route
-app.post('/pdf/analyze', upload.single('pdf'), pdfController.analyzePdf);
+app.post('/pdf/analyze', authMiddleware, upload.single('pdf'), pdfController.analyzePdf);
 
 // Chat Routes
-app.post('/chat', chatController.handleChat);
-app.post('/chat/create', chatController.createChat);
-app.get('/chat/list', chatController.listChats);
-app.post('/chat/delete', chatController.deleteChat);
-app.post('/chat/sync', chatController.syncMessages);
-app.get('/chat/messages', chatController.getMessages);
+app.post('/chat', authMiddleware, chatController.handleChat);
+app.post('/chat/create', authMiddleware, chatController.createChat);
+app.get('/chat/list', authMiddleware, chatController.listChats);
+app.post('/chat/delete', authMiddleware, chatController.deleteChat);
+app.post('/chat/sync', authMiddleware, chatController.syncMessages);
+app.get('/chat/messages', authMiddleware, chatController.getMessages);
 
 // Flashcard Routes
-app.post('/flashcards/generate', flashcardController.generateFlashcards);
-app.get('/flashcards/list', flashcardController.listAllCards);
-app.get('/flashcards/review', flashcardController.getReviewCards);
-app.post('/flashcards/review', flashcardController.updateReview);
+app.post('/flashcards/generate', authMiddleware, flashcardController.generateFlashcards);
+app.get('/flashcards/list', authMiddleware, flashcardController.listAllCards);
+app.get('/flashcards/review', authMiddleware, flashcardController.getReviewCards);
+app.post('/flashcards/review', authMiddleware, flashcardController.updateReview);
 
 // Vision Routes
-app.post('/vision/analyze', upload.single('image'), visionController.analyzeImage);
+app.post('/vision/analyze', authMiddleware, upload.single('image'), visionController.analyzeImage);
 
 // Daily Plan Routes
-app.get('/daily-plan', dailyPlanController.getTodayPlan);
-app.post('/daily-plan/complete', dailyPlanController.completeTask);
+app.get('/daily-plan', authMiddleware, dailyPlanController.getTodayPlan);
+app.post('/daily-plan/complete', authMiddleware, dailyPlanController.completeTask);
 
 // Quiz Routes
-app.post('/quiz/generate', quizController.generateQuiz);
-app.post('/quiz/save', quizController.saveQuizResult);
+app.post('/quiz/generate', authMiddleware, quizController.generateQuiz);
+app.post('/quiz/save', authMiddleware, quizController.saveQuizResult);
 
 // Stats Routes
 const statsController = require('./controllers/statsController');
-app.get('/stats/mastery', statsController.getMasteryStats);
+app.get('/stats/mastery', authMiddleware, statsController.getMasteryStats);
 
 // Study Guide Routes
 const studyGuideController = require('./controllers/studyGuideController');
-app.post('/study-guide/generate', studyGuideController.generateStudyGuide);
+app.post('/study-guide/generate', authMiddleware, studyGuideController.generateStudyGuide);
 
 // =======================
 // Start Server

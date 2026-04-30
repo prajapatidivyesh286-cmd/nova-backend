@@ -4,7 +4,7 @@ const Flashcard = require('../models/Flashcard');
 
 const getMasteryStats = async (req, res) => {
     try {
-        const { userId = 'default' } = req.query;
+        const userId = req.userId;
 
         // 1. Get User Memory which contains the chats array
         const memory = await UserMemory.findOne({ userId });

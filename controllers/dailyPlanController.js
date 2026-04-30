@@ -3,7 +3,7 @@ const studyEngine = require('../services/studyEngine');
 
 const getTodayPlan = async (req, res) => {
     try {
-        const { userId = 'default' } = req.query;
+        const userId = req.userId;
         const plan = await studyEngine.generateDailyPlan(userId);
         
         if (!plan) return res.status(200).json({ tasks: [], smartMessage: "Let's start by creating a new subject!" });
@@ -16,7 +16,8 @@ const getTodayPlan = async (req, res) => {
 
 const completeTask = async (req, res) => {
     try {
-        const { userId = 'default', taskId } = req.body;
+        const userId = req.userId;
+        const { taskId } = req.body;
         const todayStr = new Date().toISOString().split('T')[0];
         
         const plan = await DailyPlan.findOne({ userId, date: todayStr });

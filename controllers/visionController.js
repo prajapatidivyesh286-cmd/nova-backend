@@ -3,7 +3,8 @@ const memoryService = require('../services/memoryService');
 
 const analyzeImage = async (req, res) => {
     try {
-        const { userId = 'default', chatId } = req.body;
+        const userId = req.userId;
+        const { chatId } = req.body;
         const file = req.file;
 
         if (!file) return res.status(400).json({ error: "No image uploaded" });

@@ -5,7 +5,8 @@ const axios = require('axios');
 
 const generateFlashcards = async (req, res) => {
     try {
-        const { userId = 'default', chatId, topic } = req.body;
+        const userId = req.userId;
+        const { chatId, topic } = req.body;
 
         if (!chatId) return res.status(400).json({ error: "chatId is required" });
 
@@ -58,7 +59,8 @@ Rules:
 
 const getReviewCards = async (req, res) => {
     try {
-        const { userId = 'default', chatId } = req.query;
+        const userId = req.userId;
+        const { chatId } = req.query;
         const now = new Date();
 
         const query = { userId, nextReviewDate: { $lte: now } };
@@ -120,7 +122,8 @@ const updateReview = async (req, res) => {
 
 const listAllCards = async (req, res) => {
     try {
-        const { userId = 'default', chatId } = req.query;
+        const userId = req.userId;
+        const { chatId } = req.query;
         const cards = await Flashcard.find({ userId, chatId }).sort({ createdAt: -1 });
         res.status(200).json({ cards });
     } catch (error) {

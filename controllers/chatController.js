@@ -11,7 +11,8 @@ const isDbReady = () => mongoose.connection.readyState === 1;
 const createChat = async (req, res) => {
     if (!isDbReady()) return res.status(503).json({ error: "Database not ready yet, please retry." });
     try {
-        const { userId = 'default', title, subjectTag } = req.body;
+        const userId = req.userId;
+        const { title, subjectTag } = req.body;
         const chatId = crypto.randomUUID();
 
         let user = await UserMemory.findOne({ userId });
@@ -30,7 +31,7 @@ const createChat = async (req, res) => {
 const listChats = async (req, res) => {
     if (!isDbReady()) return res.status(503).json({ error: "Database not ready yet, please retry." });
     try {
-        const { userId = 'default' } = req.query;
+        const userId = req.userId;
         const user = await UserMemory.findOne({ userId });
         if (!user) return res.status(200).json({ chats: [] });
 
@@ -44,7 +45,8 @@ const listChats = async (req, res) => {
 const deleteChat = async (req, res) => {
     if (!isDbReady()) return res.status(503).json({ error: "Database not ready yet, please retry." });
     try {
-        const { userId = 'default', chatId } = req.body;
+        const userId = req.userId;
+        const { chatId } = req.body;
         const user = await UserMemory.findOne({ userId });
         if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -64,7 +66,7 @@ const handleChat = async (req, res) => {
     try {
         const incomingMessages = req.body.messages;
         const mode = req.body.mode;
-        const userId = req.body.userId || 'default'; 
+        const userId = req.userId; 
         const chatId = req.body.chatId;
 
         if (!chatId) {
@@ -163,7 +165,8 @@ Ensure your response is highly optimized:
 
 const syncMessages = async (req, res) => {
     try {
-        const { userId = 'default', chatId, messages } = req.body;
+        const userId = req.userId;
+        const { chatId, messages } = req.body;
         if (!chatId || !messages) return res.status(400).json({ error: "Missing required fields" });
 
         const user = await UserMemory.findOne({ userId });

@@ -4,7 +4,8 @@ const QuizResult = require('../models/QuizResult');
 
 const generateQuiz = async (req, res) => {
     try {
-        const { userId = 'default', chatId } = req.body;
+        const userId = req.userId;
+        const { chatId } = req.body;
         if (!chatId) return res.status(400).json({ error: "chatId is required" });
 
         console.log("Generating Quiz for Chat:", chatId);
@@ -58,7 +59,8 @@ Return a STRICT JSON response with this structure:
 
 const saveQuizResult = async (req, res) => {
     try {
-        const { userId = 'default', chatId, score, totalQuestions, subject } = req.body;
+        const userId = req.userId;
+        const { chatId, score, totalQuestions, subject } = req.body;
         
         const result = new QuizResult({
             userId,
