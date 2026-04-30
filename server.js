@@ -42,6 +42,7 @@ const pdfController = require('./controllers/pdfController');
 const quizController = require('./controllers/quizController');
 const authController = require('./controllers/authController');
 const authMiddleware = require('./middleware/authMiddleware');
+const { checkPdfLimit, checkQuizLimit } = require('./middleware/limitMiddleware');
 const multer = require('multer');
 const upload = multer({ 
     storage: multer.memoryStorage(),
@@ -55,7 +56,7 @@ app.post('/auth/register', authController.register);
 app.post('/auth/login', authController.login);
 
 // PDF Analyzer Route
-app.post('/pdf/analyze', authMiddleware, upload.single('pdf'), pdfController.analyzePdf);
+app.post('/pdf/analyze', authMiddleware, checkPdfLimit, upload.single('pdf'), pdfController.analyzePdf);
 
 // Chat Routes
 app.post('/chat', authMiddleware, chatController.handleChat);
@@ -79,7 +80,7 @@ app.get('/daily-plan', authMiddleware, dailyPlanController.getTodayPlan);
 app.post('/daily-plan/complete', authMiddleware, dailyPlanController.completeTask);
 
 // Quiz Routes
-app.post('/quiz/generate', authMiddleware, quizController.generateQuiz);
+app.post('/quiz/generate', authMiddleware, checkQuizLimit, quizController.generateQuiz);
 app.post('/quiz/save', authMiddleware, quizController.saveQuizResult);
 
 // Stats Routes
