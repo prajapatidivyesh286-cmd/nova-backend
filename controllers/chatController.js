@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const axios = require('axios');
 const crypto = require('crypto');
 const UserMemory = require('../models/UserMemory');
+const User = require('../models/User');
+const { getModelForUser } = require('../config/aiModels');
 const memoryService = require('../services/memoryService');
 const mindmapService = require('../services/mindmapService');
 
@@ -104,8 +106,12 @@ Ensure your response is highly optimized:
         const messagesForApi = [...incomingMessages];
         messagesForApi.unshift({ role: "system", content: systemContent });
 
+        const user = await User.findById(userId);
+        const selectedModelId = getModelForUser(user, req.body.requestedModel);
+        console.log(`Using AI Model: ${selectedModelId} for user: ${userId}`);
+
         const payload = {
-            model: "openai/gpt-4o-mini",
+            model: selectedModelId,
             messages: messagesForApi
         };
 
@@ -179,6 +185,7 @@ const syncMessages = async (req, res) => {
         }
         res.status(200).json({ success: true });
     } catch (error) {
+        console.error("Sync Error:", error);
         res.status(500).json({ error: "Failed to sync messages" });
     }
 };
