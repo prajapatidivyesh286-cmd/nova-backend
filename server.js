@@ -3,6 +3,10 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
+const dns = require('dns');
+
+// Force Google DNS to resolve MongoDB SRV records (fixes ECONNREFUSED)
+dns.setServers(['8.8.8.8', '8.8.4.4']);
 
 dotenv.config();
 
@@ -21,7 +25,11 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/nova_ai', {
 // =======================
 // Middleware
 // =======================
-app.use(cors());
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 const limiter = rateLimit({
@@ -54,6 +62,7 @@ app.get('/', (req, res) => res.json({ status: "Nova AI Backend is running!" }));
 // Auth Routes
 app.post('/auth/register', authController.register);
 app.post('/auth/login', authController.login);
+app.get('/auth/verify/:token', authController.verifyEmail);
 
 // PDF Analyzer Route
 app.post('/pdf/analyze', authMiddleware, checkPdfLimit, upload.single('pdf'), pdfController.analyzePdf);
